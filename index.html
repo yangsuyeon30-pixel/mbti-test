@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBTI 진단 참여하기 (12문항)</title>
+<style>
+  :root{--bg:#f4f6fb;--card:#fff;--primary:#5b6cff;--primary-dark:#4353e8;--text:#1e2433;--muted:#8a93a8;--border:#e6e9f2;--good:#16a34a;--bad:#dc2626}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:720px;margin:0 auto;padding:24px 16px 60px}
+  header.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  header.top h1{font-size:20px;margin:0}
+  header.top h1 span{color:var(--primary)}
+  .btn{border:0;border-radius:12px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text)}
+  .btn-small{padding:8px 12px;font-size:13px;border-radius:10px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:0 8px 24px rgba(30,36,51,.06)}
+  .hidden{display:none!important}
+  .center{text-align:center}
+  input[type=text]{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;outline:none}
+  .progress{height:10px;background:#e9ecf5;border-radius:999px;overflow:hidden;margin:16px 0}
+  .progress>div{height:100%;background:linear-gradient(90deg,var(--primary),#9aa6ff);width:0%;transition:width .3s}
+  .q-count{font-size:13px;color:var(--muted);font-weight:700}
+  .q-title{font-size:20px;font-weight:800;margin:12px 0 20px;line-height:1.5;word-break:keep-all}
+  .opt{display:block;width:100%;text-align:left;background:#f8f9ff;border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;font-size:15px;cursor:pointer}
+  .opt:hover{border-color:var(--primary);background:#eef0ff}
+  .opt b{color:var(--primary);margin-right:6px}
+  .nav-row{display:flex;gap:10px;margin-top:8px}
+  .result-badge{display:inline-block;background:#eef0ff;color:var(--primary);font-weight:800;padding:6px 14px;border-radius:999px;font-size:14px}
+  .result-type{font-size:56px;font-weight:900;letter-spacing:2px;margin:8px 0}
+  .result-nick{font-size:22px;font-weight:800}
+  .result-desc{background:#f8f9ff;border-radius:14px;padding:16px;margin:16px 0;line-height:1.7;font-size:15px}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.two-col{grid-template-columns:1fr}}
+  .pros,.cons{border-radius:14px;padding:16px}
+  .pros{background:#f0fdf4;border:1px solid #bbf7d0}
+  .cons{background:#fef2f2;border:1px solid #fecaca}
+  .pros h3,.cons h3{margin:0 0 10px;font-size:16px}
+  .pros h3{color:var(--good)} .cons h3{color:var(--bad)}
+  .pros ul,.cons ul{margin:0;padding-left:18px;font-size:14px;line-height:1.7}
+  .bars{margin:16px 0}
+  .bar-row{display:grid;grid-template-columns:30px 1fr 30px;gap:8px;align-items:center;margin-bottom:8px;font-size:13px;font-weight:700}
+  .bar-track{background:#eef0ff;border-radius:999px;height:12px;overflow:hidden;display:flex}
+  .bar-track i{display:block;height:100%}
+  .share-box{background:#f8f9ff;border:1px dashed #b9c1ff;border-radius:14px;padding:14px;margin-top:14px;text-align:left}
+  .share-box h4{margin:0 0 6px;font-size:14px}
+  .share-box p{margin:0 0 10px;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .link-row{display:flex;gap:8px}
+  .link-row input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:12px;background:#fff;min-width:0}
+  footer{margin-top:20px;text-align:center;color:var(--muted);font-size:12px}
+  .status{font-size:13px;margin-top:10px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>🧠 <span>MBTI</span> 12문항 진단</h1>
+  </header>
+
+  <section id="view-start" class="card center">
+    <div style="font-size:48px">🔍</div>
+    <h2 style="margin:10px 0">12개 질문으로 알아보는<br>나의 MBTI</h2>
+    <p style="color:var(--muted);font-size:14px;line-height:1.7">E/I · S/N · T/F · J/P 각 3문항, 총 12문항입니다.</p>
+    <div style="text-align:left;margin:18px 0 12px">
+      <label style="font-size:13px;font-weight:700">이름 / 닉네임</label>
+      <input id="input-name" type="text" placeholder="예) 홍길동" maxlength="20" style="margin-top:6px">
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="startQuiz()">진단 시작하기</button>
+    <div class="share-box">
+      <h4>🔗 참여자 공유링크 (이 페이지 주소)</h4>
+      <p id="share-note">이 링크를 참여자에게 보내면 바로 진단을 시작할 수 있어요. 배포 후 https 주소로 공유하세요.</p>
+      <div class="link-row">
+        <input id="participate-link" type="text" readonly value="">
+        <button class="btn btn-primary btn-small" onclick="copyParticipateLink()">복사</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-quiz" class="card hidden">
+    <div class="q-count"><span id="q-num">1</span> / 12 · <span id="q-dim"></span></div>
+    <div class="progress"><div id="q-bar"></div></div>
+    <div class="q-title" id="q-title"></div>
+    <div id="q-opts"></div>
+    <div class="nav-row"><button class="btn btn-ghost" id="btn-prev" onclick="prevQ()">← 이전</button></div>
+  </section>
+
+  <section id="view-result" class="card hidden">
+    <div class="center">
+      <div class="result-badge">진단 완료</div>
+      <div class="result-nick" id="r-name"></div>
+      <div class="result-type" id="r-type"></div>
+      <div style="font-weight:800;color:var(--primary)" id="r-alias"></div>
+    </div>
+    <div class="result-desc" id="r-desc"></div>
+    <div class="bars" id="r-bars"></div>
+    <div class="two-col">
+      <div class="pros"><h3>✅ 장점</h3><ul id="r-pros"></ul></div>
+      <div class="cons"><h3>⚠️ 단점</h3><ul id="r-cons"></ul></div>
+    </div>
+    <div class="status" id="save-status"></div>
+    <div class="nav-row" style="margin-top:12px">
+      <button class="btn btn-primary" style="flex:1" onclick="restart()">다시 진단하기</button>
+    </div>
+    <div class="share-box">
+      <h4>🔗 내 결과 공유하기</h4>
+      <p>이 링크를 열면 내 결과가 그대로 표시되고, 관리자는 이 링크로 결과를 누적할 수 있어요.</p>
+      <div class="link-row">
+        <input id="result-link" type="text" readonly value="">
+        <button class="btn btn-primary btn-small" onclick="copyResultLink()">복사</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>간이 진단용(12문항) · 참여자용 페이지입니다.</footer>
+</div>
+
+<script>
+// ===== 설정: 같은 서버의 /api/results 에 자동 누적 (모바일 포함) =====
+const CONFIG = { BACKEND_URL: "/api/results" };
+const STORE_KEY = 'mbti_results_v1';
+
+const QUESTIONS = [
+  { dim:'EI', text:'주말에 에너지를 충전하는 방법은?', a:{t:'친구들과 만나서 수다 떨기', v:'E'}, b:{t:'집에서 혼자 쉬기', v:'I'} },
+  { dim:'EI', text:'처음 만난 사람들이 많은 모임에서 나는?', a:{t:'먼저 말을 걸고 분위기를 띄운다', v:'E'}, b:{t:'상대가 말 걸 때까지 조용히 관찰한다', v:'I'} },
+  { dim:'EI', text:'팀 프로젝트에서 나는?', a:{t:'떠오르는 생각을 바로 공유한다', v:'E'}, b:{t:'충분히 정리한 뒤 공유한다', v:'I'} },
+  { dim:'SN', text:'일을 할 때 더 집중하는 것은?', a:{t:'눈앞의 현실적인 세부사항', v:'S'}, b:{t:'큰 그림과 새로운 가능성', v:'N'} },
+  { dim:'SN', text:'새 가전을 사면 나는?', a:{t:'설명서를 단계대로 읽는다', v:'S'}, b:{t:'대충 감으로 눌러보며 익힌다', v:'N'} },
+  { dim:'SN', text:'더 흥미로운 이야기는?', a:{t:'실제 경험담과 사실 기반 이야기', v:'S'}, b:{t:'미래 상상과 아이디어 이야기', v:'N'} },
+  { dim:'TF', text:'중요한 결정을 내릴 때 기준은?', a:{t:'논리와 객관적인 기준', v:'T'}, b:{t:'사람의 감정과 관계', v:'F'} },
+  { dim:'TF', text:'친구가 고민을 털어놓으면 나는?', a:{t:'원인 분석 + 해결책을 제시한다', v:'T'}, b:{t:'먼저 공감하고 위로한다', v:'F'} },
+  { dim:'TF', text:'비판을 받으면 나는?', a:{t:'내용이 타당한지부터 따진다', v:'T'}, b:{t:'마음이 먼저 상한다', v:'F'} },
+  { dim:'JP', text:'여행을 가면 나는?', a:{t:'일정·숙소·맛집을 미리 계획한다', v:'J'}, b:{t:'발길 닿는 대로 즉흥적으로 다닌다', v:'P'} },
+  { dim:'JP', text:'과제나 마감 앞에서의 나는?', a:{t:'미리미리 끝내야 마음이 편하다', v:'J'}, b:{t:'마감 직전에 몰아서 한다', v:'P'} },
+  { dim:'JP', text:'내 방 상태는?', a:{t:'제자리에 정리정돈되어 있다', v:'J'}, b:{t:'편한 대로 두지만 내가 알면 된다', v:'P'} },
+];
+const DIM_LABEL = { EI:'외향(E) / 내향(I)', SN:'감각(S) / 직관(N)', TF:'사고(T) / 감정(F)', JP:'판단(J) / 인식(P)' };
+const TYPES = {
+  INTJ:{alias:'용의주도한 전략가',desc:'독립적이고 분석적이며, 장기적인 계획으로 목표를 달성하는 전략형입니다.',pros:['뛰어난 전략적 사고','높은 독립성과 추진력','복잡한 문제 해결력'],cons:['타인 감정에 둔감해 보일 수 있음','완벽주의로 스트레스 받음','사교적 활동에서 에너지 소모']},
+  INTP:{alias:'논리적인 사색가',desc:'호기심 많고 논리적인 탐구자로, 아이디어 분석을 즐깁니다.',pros:['탁월한 논리·분석력','창의적인 문제 접근','지적 호기심이 풍부'],cons:['실행·마무리가 약할 수 있음','감정 표현이 서툼','일상 정리정돈에 약함']},
+  ENTJ:{alias:'대담한 통솔자',desc:'결단력 있고 목표 지향적인 리더로, 조직을 이끄는 데 강합니다.',pros:['강력한 리더십','빠른 결단력','목표 달성 능력'],cons:['독단적으로 보일 수 있음','감정 배려가 부족할 수 있음','완벽주의적 통제 성향']},
+  ENTP:{alias:'뜨거운 논쟁가',desc:'재치 있고 도전적인 발명가형으로, 새로운 가능성을 탐험합니다.',pros:['뛰어난 순발력과 재치','혁신적 아이디어','적응력이 뛰어남'],cons:['마무리가 약할 수 있음','논쟁을 즐겨 갈등 유발 가능','세부사항을 놓침']},
+  INFJ:{alias:'선의의 옹호자',desc:'통찰력 있고 헌신적인 이상주의자로, 의미 있는 도움을 추구합니다.',pros:['깊은 통찰력과 공감','헌신적이고 성실함','가치 중심의 행동'],cons:['번아웃에 취약함','비판에 민감함','완벽주의 성향']},
+  INFP:{alias:'열정적인 중재자',desc:'따뜻하고 상상력이 풍부하며, 자신의 가치에 충실합니다.',pros:['풍부한 공감과 진정성','창의성과 상상력','개방적이고 포용적'],cons:['현실적 실행이 약할 수 있음','비판·갈등에 취약함','우유부단할 때가 있음']},
+  ENFJ:{alias:'정의로운 사회운동가',desc:'카리스마 있고 배려심 많은 리더로, 타인의 성장을 돕습니다.',pros:['뛰어난 소통·공감 능력','사람을 이끄는 힘','헌신적인 태도'],cons:['타인 문제에 과몰입','인정 욕구가 강함','자기희생으로 지침']},
+  ENFP:{alias:'재기발랄한 활동가',desc:'열정적이고 자유로운 영혼으로, 사람과 아이디어를 연결합니다.',pros:['넘치는 열정과 에너지','뛰어난 적응력','인간관계가 넓음'],cons:['집중력이 흩어지기 쉬움','감정 기복이 있음','마무리가 약할 수 있음']},
+  ISTJ:{alias:'청렴결백한 논리주의자',desc:'신뢰할 수 있고 책임감 강한 현실주의자로, 원칙을 중시합니다.',pros:['높은 책임감과 신뢰성','꼼꼼하고 체계적','약속을 잘 지킴'],cons:['변화에 경직될 수 있음','감정 표현이 적음','새 시도를 꺼림']},
+  ISFJ:{alias:'용감한 수호자',desc:'따뜻하고 헌신적인 수호자로, 주변을 세심히 챙깁니다.',pros:['세심한 배려심','성실하고 헌신적','안정감을 줌'],cons:['자기주장이 약함','변화에 스트레스 받음','과로하기 쉬움']},
+  ESTJ:{alias:'엄격한 관리자',desc:'체계적이고 실용적인 조직가로, 질서와 효율을 중시합니다.',pros:['뛰어난 조직·관리력','실행력과 추진력','명확한 기준 제시'],cons:['고집스럽게 보일 수 있음','감정 배려 부족 가능','융통성이 부족할 때 있음']},
+  ESFJ:{alias:'사교적인 외교관',desc:'친절하고 협력적인 분위기 메이커로, 조화를 중시합니다.',pros:['뛰어난 사교성과 배려','협력을 잘 이끌어냄','책임감이 강함'],cons:['비판에 민감함','인정 욕구가 강함','갈등 회피 성향']},
+  ISTP:{alias:'만능 재주꾼',desc:'침착하고 실용적인 문제 해결사로, 손으로 만지며 배웁니다.',pros:['침착한 위기대처','실용적 손재주','유연한 적응력'],cons:['감정 공유가 적음','장기 계획에 약함','권태를 쉽게 느낌']},
+  ISFP:{alias:'호기심 많은 예술가',desc:'온화하고 감각적인 예술가형으로, 현재의 아름다움을 즐깁니다.',pros:['따뜻한 감성과 예술감각','유연하고 겸손함','현재를 즐기는 힘'],cons:['자기주장이 약함','계획 세우기 어려움','비판을 개인적으로 받음']},
+  ESTP:{alias:'모험을 즐기는 사업가',desc:'에너지 넘치고 현실적인 해결사로, 즉각 행동합니다.',pros:['빠른 실행력과 순발력','실현적 문제 해결','사교성과 에너지'],cons:['충동적일 수 있음','장기 계획에 약함','지루함을 못 견딤']},
+  ESFP:{alias:'자유로운 영혼의 연예인',desc:'밝고 자발적인 분위기 메이커로, 주변을 즐겁게 합니다.',pros:['밝은 에너지와 낙천성','뛰어난 사교성','현재를 즐기는 태도'],cons:['집중력이 짧을 수 있음','계획·마무리에 약함','감정 기복이 있음']},
+};
+
+let answers = new Array(12).fill(null), cur = 0, userName = '', lastResult = null;
+
+function showView(name){
+  ['start','quiz','result'].forEach(v=>document.getElementById('view-'+v).classList.add('hidden'));
+  document.getElementById('view-'+name).classList.remove('hidden');
+}
+function startQuiz(){
+  userName = document.getElementById('input-name').value.trim();
+  if(!userName){ alert('이름/닉네임을 입력해 주세요.'); return; }
+  answers = new Array(12).fill(null); cur = 0;
+  showView('quiz'); renderQ();
+}
+function renderQ(){
+  const q = QUESTIONS[cur];
+  document.getElementById('q-num').textContent = cur+1;
+  document.getElementById('q-dim').textContent = DIM_LABEL[q.dim];
+  document.getElementById('q-bar').style.width = (cur/12*100)+'%';
+  document.getElementById('q-title').textContent = q.text;
+  document.getElementById('btn-prev').style.visibility = cur===0 ? 'hidden' : 'visible';
+  const box = document.getElementById('q-opts'); box.innerHTML='';
+  [{t:q.a.t,v:q.a.v,k:'A'},{t:q.b.t,v:q.b.v,k:'B'}].forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.innerHTML='<b>'+o.k+'</b> '+o.t;
+    b.onclick=()=>{ answers[cur]=o.v; cur++; if(cur<12) renderQ(); else finish(); };
+    box.appendChild(b);
+  });
+}
+function prevQ(){ if(cur>0){cur--;renderQ();} }
+function calcType(){
+  const score={E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+  answers.forEach(v=>{ if(v) score[v]++; });
+  return { type:(score.E>=score.I?'E':'I')+(score.S>=score.N?'S':'N')+(score.T>=score.F?'T':'F')+(score.J>=score.P?'J':'P'), score };
+}
+async function finish(){
+  const {type,score}=calcType();
+  const record = { id:'id_'+Date.now()+'_'+Math.floor(Math.random()*1e6), name:userName, type, score, date:new Date().toISOString() };
+  saveLocal(record);
+  displayResult(record, false);
+  sendToCloud(record);
+}
+function displayResult(r, isShared){
+  const info=TYPES[r.type]; if(!info) return;
+  document.getElementById('r-name').textContent = r.name+'님의 결과';
+  document.getElementById('r-type').textContent = r.type;
+  document.getElementById('r-alias').textContent = info.alias;
+  document.getElementById('r-desc').textContent = info.desc;
+  document.getElementById('r-pros').innerHTML = info.pros.map(x=>'<li>'+x+'</li>').join('');
+  document.getElementById('r-cons').innerHTML = info.cons.map(x=>'<li>'+x+'</li>').join('');
+  const s=r.score;
+  const row=(a,b)=>{const t=(s[a]+s[b])||1,p=Math.round(s[a]/t*100);
+    return '<div class="bar-row"><span>'+a+' '+s[a]+'</span><div class="bar-track"><i style="width:'+p+'%;background:var(--primary)"></i><i style="width:'+(100-p)+'%;background:#c3cbff"></i></div><span>'+s[b]+' '+b+'</span></div>';};
+  document.getElementById('r-bars').innerHTML = row('E','I')+row('S','N')+row('T','F')+row('J','P');
+  lastResult=r;
+  document.getElementById('result-link').value = buildResultUrl(r);
+  const st=document.getElementById('save-status');
+  if(isShared) st.textContent = '공유된 결과 링크로 열린 화면입니다.';
+  else if(getBackendUrl()) st.textContent = '⌛ 관리자 서버에 전송 중...';
+  else st.textContent = '✔ 내 브라우저에 저장됐어요. (여러 명 누적은 관리자 페이지 + 서버 연동 필요)';
+  showView('result');
+}
+function restart(){ showView('start'); }
+
+// ---- 저장 + 공유 ----
+function loadLocal(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||[]}catch(e){return[]} }
+function saveLocal(r){ const a=loadLocal(); a.unshift(r); try{localStorage.setItem(STORE_KEY,JSON.stringify(a));}catch(e){} }
+function getBackendUrl(){ return (CONFIG.BACKEND_URL||'').trim() || (localStorage.getItem('mbti_backend_url')||'').trim(); }
+async function sendToCloud(r){
+  const url=getBackendUrl();
+  if(!url){ return; }
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'add',record:r})});
+    document.getElementById('save-status').textContent='✔ 관리자 서버에 누적 저장됐어요.';
+  }catch(e){
+    document.getElementById('save-status').textContent='⚠ 서버 전송 실패. 결과 공유링크로 관리자에게 전달해 주세요.';
+  }
+}
+function baseUrl(){ return location.href.split('?')[0].split('#')[0]; }
+function buildResultUrl(r){
+  const code=btoa(unescape(encodeURIComponent(JSON.stringify({n:r.name,t:r.type,s:r.score,id:r.id,d:r.date})))).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
+  return baseUrl()+'?r='+code;
+}
+function parseCode(code){
+  try{let b=code.replaceAll('-','+').replaceAll('_','/');while(b.length%4)b+='=';return JSON.parse(decodeURIComponent(escape(atob(b))));}catch(e){return null;}
+}
+async function copyText(t,msg){ try{await navigator.clipboard.writeText(t);alert(msg);}catch(e){const el=document.createElement('textarea');el.value=t;document.body.appendChild(el);el.select();try{document.execCommand('copy');alert(msg);}catch(_){prompt('복사해서 사용하세요:',t);}el.remove();} }
+function copyParticipateLink(){ copyText(baseUrl(),'참여자 링크(이 페이지 주소)가 복사됐어요.'); }
+function copyResultLink(){ if(!lastResult)return alert('먼저 진단을 완료하세요.'); copyText(document.getElementById('result-link').value,'결과 공유링크가 복사됐어요.'); }
+
+// 초기 진입
+(function init(){
+  document.getElementById('participate-link').value=baseUrl();
+  if(location.protocol==='file:') document.getElementById('share-note').innerHTML='지금은 로컬 파일이라 이 주소를 보내도 타인은 열 수 없어요. Netlify Drop / GitHub Pages 등으로 배포 후 https 주소를 공유하세요. (참여자용은 이 파일, 관리자용은 admin.html)';
+  const q=new URLSearchParams(location.search);
+  if(q.has('r')){
+    const d=parseCode(q.get('r'));
+    if(d&&d.t&&TYPES[d.t]){
+      const sc=Object.assign({E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0},d.s||{});
+      displayResult({id:d.id||('id_'+Date.now()),name:String(d.n||'공유').slice(0,20),type:d.t,score:sc,date:d.d||new Date().toISOString()},true);
+    }
+  }
+})();
+</script>
+</body>
+</html>

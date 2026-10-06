@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBTI 관리자 대시보드</title>
+<style>
+  :root{--bg:#f4f6fb;--card:#fff;--primary:#5b6cff;--text:#1e2433;--muted:#8a93a8;--border:#e6e9f2;--bad:#dc2626}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+  header.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px;flex-wrap:wrap}
+  header.top h1{font-size:20px;margin:0}
+  .btn{border:0;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text)}
+  .btn-danger{background:#fee2e2;color:var(--bad)}
+  .btn-small{padding:7px 10px;font-size:12.5px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(30,36,51,.06);margin-bottom:12px}
+  .card h2{margin:0 0 4px;font-size:18px}
+  .card h3{font-size:14px;margin:14px 0 8px}
+  .muted{color:var(--muted);font-size:13px;line-height:1.7}
+  input[type=text]{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+  @media(max-width:560px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+  .stat strong{font-size:20px;display:block}
+  .stat span{font-size:12px;color:var(--muted)}
+  .type-dist{display:grid;gap:8px}
+  .dist-row{display:grid;grid-template-columns:52px 1fr 90px;gap:8px;align-items:center;font-size:13px}
+  .dist-bar{background:#eef0ff;height:10px;border-radius:999px;overflow:hidden}
+  .dist-bar i{display:block;height:100%;background:var(--primary)}
+  .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:#fff}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+  th,td{padding:10px 8px;border-bottom:1px solid var(--border);text-align:left}
+  th{background:#f8f9ff;white-space:nowrap}
+  details{margin-top:10px}
+  details summary{cursor:pointer;font-weight:700;font-size:13px}
+  code{background:#f1f3fa;padding:2px 6px;border-radius:6px;font-size:12px}
+  pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:12px;overflow-x:auto;font-size:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>📊 MBTI 관리자 대시보드</h1>
+    <div style="display:flex;gap:8px">
+      <a href="index.html" style="text-decoration:none"><button class="btn btn-ghost btn-small">참여자 페이지 열기</button></a>
+      <button class="btn btn-primary btn-small" onclick="refresh()">🔄 새로고침</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>결과 누적 상태</h2>
+    <div class="muted" id="src-status">불러오는 중...</div>
+    <div class="stat-grid">
+      <div class="stat"><strong id="st-total">0</strong><span>총 응답 (누적)</span></div>
+      <div class="stat"><strong id="st-e">-</strong><span>E : I</span></div>
+      <div class="stat"><strong id="st-t">-</strong><span>T : F</span></div>
+      <div class="stat"><strong id="st-j">-</strong><span>J : P</span></div>
+    </div>
+    <h3>유형별 분포</h3>
+    <div class="type-dist" id="dist"></div>
+    <div class="row">
+      <button class="btn btn-ghost btn-small" onclick="exportCSV()">CSV 내보내기</button>
+      <button class="btn btn-ghost btn-small" onclick="exportJSON()">JSON 백업</button>
+      <button class="btn btn-ghost btn-small" onclick="document.getElementById('file').click()">JSON 가져오기(합치기)</button>
+      <input type="file" id="file" accept=".json" style="display:none" onchange="importJSON(this)">
+      <button class="btn btn-danger btn-small" onclick="clearAll()">전체 삭제</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔗 결과 링크로 누적하기 (서버 없이 가능)</h2>
+    <p class="muted">참여자 결과 공유링크(<code>?r=코드</code>)를 아래에 붙여넣으면 이 관리자 브라우저에 누적 저장됩니다. 참여자가 보낸 링크를 모아 붙여넣는 용도입니다.</p>
+    <input id="link-input" type="text" placeholder="예) https://.../index.html?r=eyJuIj... 또는 코드만">
+    <div class="row">
+      <button class="btn btn-primary btn-small" onclick="addByLink()">링크 1건 추가</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>☁️ 자동 누적 서버 연동 (여러 기기 → 1곳 자동 합산)</h2>
+    <p class="muted">순수 HTML만으로는 기기가 다르면 자동 합산이 안 됩니다. 아래 GAS 웹앱 URL을 등록하면 참여자 페이지(<code>index.html</code>의 CONFIG.BACKEND_URL 또는 아래 입력값)가 진단 즉시 서버에 전송하고, 이 페이지는 서버+로컬을 합쳐서 보여줍니다.</p>
+    <input id="backend-url" type="text" placeholder="https://script.google.com/macros/s/XXXX/exec">
+    <div class="row">
+      <button class="btn btn-primary btn-small" onclick="saveBackend()">서버 URL 저장</button>
+      <button class="btn btn-ghost btn-small" onclick="refresh()">서버에서 불러오기</button>
+    </div>
+    <details>
+      <summary>서버 만들기 (무료, 5분) — Google Apps Script + 스프레드시트</summary>
+      <div class="muted">
+        <ol>
+          <li><code>backend.gs</code> 파일 내용을 복사하세요 (이 폴더에 함께 생성됨).</li>
+          <li>Google 스프레드시트 새로 만들기 → 확장 프로그램 → Apps Script → 코드 붙여넣기 → 배포 → 웹 앱으로 배포 (액세스: 모든 사용자).</li>
+          <li>발급된 <code>/exec</code> URL을 위 입력칸에 저장 + <code>index.html</code>의 <code>CONFIG.BACKEND_URL</code>에도 같은 URL을 넣어 재배포하세요.</li>
+          <li>이후 참여자 응답은 자동으로 서버에 쌓이고, 이 대시보드는 서버+로컬을 합산 표시합니다.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>이름</th><th>유형</th><th>E/I</th><th>S/N</th><th>T/F</th><th>J/P</th><th>일시</th><th>출처</th><th>관리</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const STORE_KEY='mbti_results_v1';
+const CONFIG={BACKEND_URL:"/api/results"}; // 같은 서버 자동 누적 (모바일 포함)
+let cloudCache=[];
+
+function getBackendUrl(){return (CONFIG.BACKEND_URL||'').trim()||(localStorage.getItem('mbti_backend_url')||'').trim();}
+function loadLocal(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||[]}catch(e){return[]}}
+function saveLocalAll(a){try{localStorage.setItem(STORE_KEY,JSON.stringify(a));}catch(e){}}
+function mergeAll(local,cloud){
+  const m=new Map();
+  [...cloud,...local].forEach(r=>{if(r&&r.id&&!m.has(r.id))m.set(r.id,r);});
+  return [...m.values()].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+}
+async function fetchCloud(){
+  const url=getBackendUrl(); if(!url) return [];
+  try{
+    const res=await fetch(url+'?action=list',{cache:'no-store'});
+    const j=await res.json();
+    return Array.isArray(j.records)?j.records:[];
+  }catch(e){return [];}
+}
+function parseCode(input){
+  let code=(input||'').trim();
+  const m=code.match(/[?&]r=([^&#\s]+)/); if(m) code=m[1];
+  try{let b=code.replaceAll('-','+').replaceAll('_','/');while(b.length%4)b+='=';return JSON.parse(decodeURIComponent(escape(atob(b))));}catch(e){return null;}
+}
+function codeToRecord(d){
+  if(!d||!d.t||!/^[EI][SN][TF][JP]$/.test(d.t))return null;
+  const sc=Object.assign({E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0},d.s||{});
+  return {id:d.id||('id_'+Date.now()+'_'+Math.floor(Math.random()*1e6)),name:String(d.n||d.name||'익명').slice(0,20),type:d.t,score:sc,date:d.d||d.date||new Date().toISOString(),_src:'link'};
+}
+async function refresh(){
+  const url=getBackendUrl();
+  document.getElementById('backend-url').value=url;
+  // 1) ?r= 자동 누적
+  const q=new URLSearchParams(location.search);
+  let added=0;
+  if(q.has('r')){
+    const rec=codeToRecord(parseCode(q.get('r')));
+    if(rec){const l=loadLocal();if(!l.some(x=>x.id===rec.id)){l.unshift(rec);saveLocalAll(l);added=1;}}
+    history.replaceState(null,'',location.pathname);
+  }
+  // 2) 서버+로컬 합산
+  cloudCache=await fetchCloud();
+  const local=loadLocal();
+  const all=mergeAll(local.map(r=>({...r,_src:r._src||'local'})),cloudCache.map(r=>({...r,_src:'cloud'})));
+  render(all,added);
+}
+function render(all,added){
+  const url=getBackendUrl();
+  document.getElementById('src-status').innerHTML=
+    '총 <b>'+all.length+'</b>건 (로컬 '+loadLocal().length+' + 서버 '+cloudCache.length+')'+
+    (url?' · 서버 연동됨':' · 서버 미연동 — 같은 브라우저 결과만 + 링크/파일로 누적 가능')+
+    (added?' · 링크 1건이 방금 누적됨':'');
+
+  document.getElementById('st-total').textContent=all.length;
+  const c={E:0,I:0,T:0,F:0,J:0,P:0};
+  all.forEach(r=>{if(r.type){c[r.type[0]]++;c[r.type[2]]++;c[r.type[3]]++;}});
+  document.getElementById('st-e').textContent=all.length?c.E+':'+c.I:'-';
+  document.getElementById('st-t').textContent=all.length?c.T+':'+c.F:'-';
+  document.getElementById('st-j').textContent=all.length?c.J+':'+c.P:'-';
+
+  const by={};all.forEach(r=>by[r.type]=(by[r.type]||0)+1);
+  const d=document.getElementById('dist');d.innerHTML='';
+  const s=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  if(!s.length)d.innerHTML='<div class="muted">아직 누적된 결과가 없습니다.</div>';
+  s.forEach(([t,n])=>{const p=Math.round(n/(all.length||1)*100);
+    const row=document.createElement('div');row.className='dist-row';
+    row.innerHTML='<b>'+t+'</b><div class="dist-bar"><i style="width:'+p+'%"></i></div><span>'+n+'명('+p+'%)</span>';
+    d.appendChild(row);});
+
+  const tb=document.getElementById('tbody');tb.innerHTML='';
+  all.forEach(r=>{
+    const tr=document.createElement('tr');
+    const dt=fmtDate(r.date);
+    tr.innerHTML='<td>'+esc(r.name)+'</td><td><b>'+r.type+'</b></td><td>E'+r.score.E+' / I'+r.score.I+'</td><td>S'+r.score.S+' / N'+r.score.N+'</td><td>T'+r.score.T+' / F'+r.score.F+'</td><td>J'+r.score.J+' / P'+r.score.P+'</td><td style="white-space:nowrap">'+dt+'</td><td>'+(r._src||'')+'</td>';
+    const td=document.createElement('td');
+    const del=document.createElement('button');del.className='btn btn-danger btn-small';del.textContent='삭제';
+    del.onclick=async()=>{
+      saveLocalAll(loadLocal().filter(x=>x.id!==r.id));
+      if(r._src==='cloud'&&getBackendUrl()){try{await fetch(getBackendUrl(),{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'delete',id:r.id})});}catch(e){}}
+      refresh();
+    };
+    td.appendChild(del);tr.appendChild(td);tb.appendChild(tr);
+  });
+  window._all=all;
+}
+function fmtDate(iso){try{return new Date(iso).toLocaleString('ko-KR');}catch(e){return iso||'';}}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function addByLink(){
+  const rec=codeToRecord(parseCode(document.getElementById('link-input').value));
+  if(!rec)return alert('링크/코드를 인식할 수 없어요. ?r= 포함 전체 URL을 붙여넣으세요.');
+  const l=loadLocal();
+  if(l.some(x=>x.id===rec.id))return alert('이미 누적된 결과입니다. (중복)');
+  l.unshift(rec);saveLocalAll(l);
+  document.getElementById('link-input').value='';
+  refresh();alert(rec.name+'('+rec.type+') 1건 누적됐어요.');
+}
+function saveBackend(){const v=document.getElementById('backend-url').value.trim();localStorage.setItem('mbti_backend_url',v);alert(v?'서버 URL 저장됨':'서버 연결 해제됨');refresh();}
+function clearAll(){if(confirm('로컬 누적 데이터를 모두 삭제할까요? (서버 데이터는 유지)')){localStorage.removeItem(STORE_KEY);refresh();}}
+function exportCSV(){
+  const a=window._all||[];if(!a.length)return alert('데이터 없음');
+  const h='name,type,E,I,S,N,T,F,J,P,date,src\n';
+  const b=a.map(r=>[r.name,r.type,r.score.E,r.score.I,r.score.S,r.score.N,r.score.T,r.score.F,r.score.J,r.score.P,'"'+r.date+'"',(r._src||'')].join(',')).join('\n');
+  dl(new Blob(['\ufeff'+h+b],{type:'text/csv'}),'mbti_results.csv');
+}
+function exportJSON(){dl(new Blob([JSON.stringify(window._all||[],null,2)],{type:'application/json'}),'mbti_results.json');}
+function importJSON(input){
+  const f=input.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{
+    const j=JSON.parse(rd.result);const arr=Array.isArray(j)?j:j.records||[];
+    const l=loadLocal();let n=0;
+    arr.forEach(r=>{if(r&&r.id&&r.type&&!l.some(x=>x.id===r.id)){l.push(r);n++;}});
+    saveLocalAll(l);refresh();alert(n+'건 합쳐짐 (중복 제외)');
+  }catch(e){alert('JSON 해석 실패');}input.value='';};
+  rd.readAsText(f);
+}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+refresh();
+</script>
+</body>
+</html>
