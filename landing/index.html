@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suyeon L&D Lab · AI & HRD 혁신 플레이북</title>
+  <meta name="description" content="일하는 방식의 변화, 생성형 AI로 완성하는 스마트 HR/L&D 실무 가이드">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(22, 30, 49, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #c084fc;
+      --primary-hover: #a855f7;
+      --primary-glow: rgba(192, 132, 252, 0.25);
+      --accent: #38bdf8;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --success: #34d399;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    /* Background Glow Effects */
+    .glow-top {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, rgba(56, 189, 248, 0.08) 50%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+    /* Header / Nav */
+    header {
+      padding: 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #c084fc, #38bdf8);
+      color: #090d16;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--success);
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 72px 0 48px;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(192, 132, 252, 0.12);
+      border: 1px solid rgba(192, 132, 252, 0.3);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #c084fc 20%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 36px;
+      word-break: keep-all;
+    }
+
+    /* CTA Form */
+    .cta-box {
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+    }
+    .cta-form {
+      display: flex;
+      gap: 8px;
+    }
+    .cta-form input {
+      flex: 1;
+      padding: 14px 18px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .cta-form input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .cta-form button {
+      padding: 14px 22px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+    .cta-form button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+    .cta-hint {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Features Grid */
+    .features {
+      padding: 64px 0 40px;
+    }
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .section-title h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(10px);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(192, 132, 252, 0.4);
+      box-shadow: 0 12px 30px -10px var(--primary-glow);
+    }
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    /* Interactive Preview Tab */
+    .preview-section {
+      padding: 40px 0 64px;
+    }
+    .preview-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: rgba(192, 132, 252, 0.15);
+      border-color: rgba(192, 132, 252, 0.3);
+      color: var(--primary);
+    }
+    .tab-content {
+      background: rgba(10, 15, 26, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 0.92rem;
+      color: #e2e8f0;
+      line-height: 1.7;
+    }
+    .code-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(22, 30, 49, 0.95);
+      border: 1px solid var(--primary);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px var(--primary-glow);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 36px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .grid { grid-template-columns: 1fr; }
+      .cta-form { flex-direction: column; }
+      .cta-form button { width: 100%; }
+      .hero { padding: 48px 0 32px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-top"></div>
+
+  <div class="container">
+    <header>
+      <a href="#" class="logo">
+        <span>Suyeon L&D Lab</span>
+        <span class="logo-badge">PRO</span>
+      </a>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        <span>Vercel 라이브 배포</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-tag">✨ 생성형 AI x HR/L&D 실무 혁신</div>
+        <h1>일하는 방식의 변화,<br><span>AI로 완성하는 스마트 L&D</span></h1>
+        <p>기획서 작성부터 맞춤형 인터랙티브 교육 설계, 반복 업무 자동화까지.<br>HRD 실무자를 위해 엄선한 생성형 AI 워크플로우 플레이북</p>
+
+        <div class="cta-box">
+          <form class="cta-form" id="signupForm">
+            <input type="email" id="emailInput" placeholder="이메일 주소를 입력해 주세요" required>
+            <button type="submit">가이드북 신청</button>
+          </form>
+          <div class="cta-hint">
+            현재 사전 신청자 <strong id="signupCount" style="color: var(--primary);">128</strong>명 · 무료 배포 예정
+          </div>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="section-title">
+          <h2>핵심 실무 모듈</h2>
+          <p>현업에 바로 적용할 수 있는 3가지 실무 솔루션</p>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <span class="card-icon">⚡</span>
+            <h3>실무 프롬프트 팩</h3>
+            <p>신규 입사자 온보딩 플랜, 사내 교육 기획서, 설문 문항 설계를 클릭 한 번으로 뽑아내는 실전 프롬프트 라이브러리</p>
+          </div>
+          <div class="card">
+            <span class="card-icon">🎯</span>
+            <h3>인터랙티브 웹 진단</h3>
+            <p>MBTI, 업무 성향 진단, 조직 적응도 테스트 등 웹에서 누구나 가볍게 참여하고 결과 리포트를 받는 반응형 웹 모듈</p>
+          </div>
+          <div class="card">
+            <span class="card-icon">🤖</span>
+            <h3>AI 에이전트 자동화</h3>
+            <p>참석자 명단 정리, 교육 안내문 발송, 피드백 분석 등 번거로운 행정 업무를 AI 비서에게 맡기는 워크플로우</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="preview-section">
+        <div class="preview-box">
+          <div style="margin-bottom: 16px;">
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px;">미리보는 실무 프롬프트 템플릿</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">아래 탭을 눌러 분야별 프롬프트 구조를 확인해 보세요.</p>
+          </div>
+
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(0)">신규 온보딩 설계</button>
+            <button class="tab-btn" onclick="switchTab(1)">교육 만족도 심층분석</button>
+            <button class="tab-btn" onclick="switchTab(2)">사내 AI 활용 가이드</button>
+          </div>
+
+          <div class="tab-content" id="tabContent">
+            <!-- Dynamic tab content -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2026 Suyeon Yang · Deployed with <strong>GitHub & Vercel</strong> by Cheese (Pickle AI)</p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">
+    <span>🎉</span>
+    <span id="toastMsg">사전 신청이 완료되었습니다! 가이드북 출시 시 안내해 드릴게요.</span>
+  </div>
+
+  <script src="/config.js"></script>
+  <script>
+    const tabsData = [
+      {
+        tag: "ONBOARDING PROMPT",
+        title: "신규 입사자 30-60-90일 안착 프로그램 설계",
+        text: `당신은 10년 차 글로벌 기업 L&D 전문가입니다. 신규 입사자가 조직 문화에 연착륙하고 업무 자율성을 갖출 수 있도록 [직무: HR/기획] 대상의 30일(이해와 적응), 60일(협업과 기여), 90일(자율적 성과 창출) 온보딩 로드맵 및 주차별 체크리스트를 표 형식으로 작성해 주세요.`
+      },
+      {
+        tag: "ANALYTICS PROMPT",
+        title: "사내 교육 정성 피드백 정밀 감성·개선점 추출",
+        text: `아래 첨부된 150명의 사내 교육 자유 서술형 피드백을 분석해 주세요. 1) 수강생들이 가장 만족한 핵심 가치 TOP 3, 2) 반복적으로 지적된 실무 적용의 병목점, 3) 차기 교육 설계 시 즉시 반영해야 할 실행 과제 3가지를 도출해 주세요.`
+      },
+      {
+        tag: "AI POLICY PROMPT",
+        title: "전사 임직원을 위한 생성형 AI 프롬프트 가이드라인",
+        text: `비개발 직군(인사, 총무, 마케팅, 영업) 임직원이 일상 업무에서 안전하고 효과적으로 생성형 AI를 활용할 수 있도록 '사내 정보 보안 준수 수칙'과 '업무 생산성 2배 프롬프트 작성 공식(역할-맥락-지침-출력형식)'을 간결한 사내 공지문 형태로 작성해 주세요.`
+      }
+    ];
+
+    function switchTab(index) {
+      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === index);
+      });
+      const data = tabsData[index];
+      document.getElementById('tabContent').innerHTML = `
+        <div class="code-tag">${data.tag}</div>
+        <div style="font-weight: 700; margin-bottom: 8px; color: #f8fafc;">${data.title}</div>
+        <div style="color: #cbd5e1; font-size: 0.9rem; white-space: pre-line;">${data.text}</div>
+      `;
+    }
+
+    // Init tab
+    switchTab(0);
+
+    // Signup form handler
+    let count = 128;
+    const form = document.getElementById('signupForm');
+    const input = document.getElementById('emailInput');
+    const countEl = document.getElementById('signupCount');
+    const toast = document.getElementById('toast');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = input.value.trim();
+      if (!email) return;
+
+      count++;
+      countEl.textContent = count;
+      input.value = '';
+
+      showToast(`🎉 ${email} 신청 완료! 가이드북 출시 소식을 전해드릴게요.`);
+    });
+
+    function showToast(msg) {
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
